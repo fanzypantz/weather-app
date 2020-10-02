@@ -1,8 +1,17 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {useSelector} from "react-redux";
+import {RootState} from "./reducers";
 
 function App() {
+
+  const weather = useSelector((state: RootState) => {
+    return state.weather;
+  });
+
+  console.log('weather: ', weather);
+
   return (
     <div className="App">
       <header className="App-header">
