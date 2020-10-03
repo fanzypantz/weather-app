@@ -5,6 +5,7 @@ import allActions from "../actions";
 
 import cities from "../data/city.list.json";
 import weather from "../reducers/weather";
+import { WeatherInterface } from "../interfaces";
 
 const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 
@@ -46,7 +47,7 @@ function SearchBar() {
   };
 
   const fetchWeatherData = (city: { coord: { lat: number; lon: number } }) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<WeatherInterface>((resolve, reject) => {
       fetch(
         `https://api.openweathermap.org/data/2.5/onecall?lat=${city.coord.lat}&lon=${city.coord.lon}&appid=${WEATHER_API_KEY}`
       )
