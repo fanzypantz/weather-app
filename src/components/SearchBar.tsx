@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import allActions from "../actions";
 
 import cities from "../data/city.list.json";
+import weather from "../reducers/weather";
 
 const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 
@@ -44,30 +45,32 @@ function SearchBar() {
     }
   };
 
-  const selectCity = (city: {
-    coord: {
-      lat: number;
-      lon: number;
-    };
-  }) => {
-    console.log("city: ", city);
-    fetch(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${city.coord.lat}&lon=${city.coord.lon}&appid=${WEATHER_API_KEY}`
-    )
-      .then((res) => res.json())
-      .then((res) => {
-        console.log("res: ", res);
-        dispatch(allActions.weatherActions.setWeather(res));
-        setRenderCities([]);
-        setSearchQuery("");
-      })
-      .catch((err) => {
-        console.log("errors: ", err);
-      });
+  const fetchWeatherData = (city: { coord: { lat: number; lon: number } }) => {
+    return new Promise((resolve, reject) => {
+      fetch(
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${city.coord.lat}&lon=${city.coord.lon}&appid=${WEATHER_API_KEY}`
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  };
+
+  const handleClick = async (city: { coord: { lat: number; lon: number } }) => {
+    const weatherData = await fetchWeatherData(city);
+    if (weatherData) {
+      dispatch(allActions.weatherActions.setWeather(weatherData));
+      setRenderCities([]);
+      setSearchQuery("");
+    }
   };
 
   const citiesList = renderCities.map((city: any, index: number) => (
-    <div key={index} onClick={() => selectCity(city)}>
+    <div key={index} onClick={() => handleClick(city)}>
       {city.name}
     </div>
   ));
