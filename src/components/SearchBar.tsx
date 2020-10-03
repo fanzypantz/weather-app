@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "../App.css";
-import { useSelector } from "react-redux";
-import { RootState } from "../reducers";
+import { useDispatch } from "react-redux";
+import allActions from "../actions";
 
 import cities from "../data/city.list.json";
 
@@ -13,9 +13,7 @@ function SearchBar() {
   const [renderCities, setRenderCities] = useState([] as any);
 
   // Global State
-  const weather = useSelector((state: RootState) => {
-    return state.weather;
-  });
+  const dispatch = useDispatch();
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // TODO remove this if unused
@@ -47,24 +45,26 @@ function SearchBar() {
   };
 
   const selectCity = (city: {
-    name: string;
-    state: string;
-    country: string;
+    coord: {
+      lat: number;
+      lon: number;
+    };
   }) => {
     console.log("city: ", city);
     fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city.name},${city.state},${city.country}&appid=${WEATHER_API_KEY}`
+      `https://api.openweathermap.org/data/2.5/onecall?lat=${city.coord.lat}&lon=${city.coord.lon}&appid=${WEATHER_API_KEY}`
     )
       .then((res) => res.json())
       .then((res) => {
         console.log("res: ", res);
+        dispatch(allActions.weatherActions.setWeather(res));
+        setRenderCities([]);
+        setSearchQuery("");
       })
       .catch((err) => {
         console.log("errors: ", err);
       });
   };
-
-  const queryCity = (id: number) => {};
 
   const citiesList = renderCities.map((city: any, index: number) => (
     <div key={index} onClick={() => selectCity(city)}>
@@ -75,7 +75,11 @@ function SearchBar() {
   return (
     <div className="searchbar">
       {citiesList}
-      <input type="text" onChange={(e) => onSearchChange(e)} />
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => onSearchChange(e)}
+      />
     </div>
   );
 }
