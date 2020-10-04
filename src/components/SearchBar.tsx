@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import "../App.css";
+import "../App.scss";
 import { useDispatch } from "react-redux";
 import allActions from "../actions";
 
 import cities from "../data/city.list.json";
-import weather from "../reducers/weather";
 import { WeatherInterface } from "../interfaces";
 
 const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
@@ -49,7 +48,7 @@ function SearchBar() {
   const fetchWeatherData = (city: { coord: { lat: number; lon: number } }) => {
     return new Promise<WeatherInterface>((resolve, reject) => {
       fetch(
-        `https://api.openweathermap.org/data/2.5/onecall?lat=${city.coord.lat}&lon=${city.coord.lon}&appid=${WEATHER_API_KEY}`
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${city.coord.lat}&lon=${city.coord.lon}&units=metric&appid=${WEATHER_API_KEY}`
       )
         .then((res) => res.json())
         .then((res) => {
@@ -73,6 +72,8 @@ function SearchBar() {
   const citiesList = renderCities.map((city: any, index: number) => (
     <div key={index} onClick={() => handleClick(city)}>
       {city.name}
+      {city.state !== "" && "-" + city.state}
+      {city.country !== "" && "-" + city.country}
     </div>
   ));
 
